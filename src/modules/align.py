@@ -120,22 +120,22 @@ def generate_event_windows(events, market):
 # Save processed datasets
 def save_outputs(events, event_windows_df, estimation_df):
 
-    event_windows_df.to_csv("../../data/processed/events_window.csv", index=False)
-    events.to_csv("../../data/processed/events_all.csv", index=False)
-    estimation_df.to_csv("../../data/processed/estimation_window.csv", index=False)
+    event_windows_df.to_csv("data/processed/events_window.csv", index=False)
+    events.to_csv("data/processed/events_all.csv", index=False)
+    estimation_df.to_csv("data/processed/estimation_window.csv", index=False)
 
 
 
 # Main pipeline
-def main():
+def align_market_with_fedevents():
 
     events = load_events(
-        "../src/data/raw/fomc_statements.csv",
-        "../src/data/raw/fomc_minutes.csv",
-        "../src/data/raw/fed_speeches.csv"
+        "data/raw/fomc_statements.csv",
+        "data/raw/fomc_minutes.csv",
+        "data/raw/fed_speeches.csv"
     )
 
-    market = load_market_data("../src/data/raw/market_data.csv")
+    market = load_market_data("data/raw/market_data.csv")
 
     events = align_events(events, market)
 
@@ -147,4 +147,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    align_market_with_fedevents()
