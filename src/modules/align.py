@@ -1,31 +1,45 @@
-# import necessary libraries
 import pandas as pd
-import datetime
 
-# read csvs into respective dfs
-statements = pd.read_csv("../src/data/raw/fomc_statements.csv")
-minutes = pd.read_csv("../src/data/raw/fomc_minutes.csv")
-speeches = pd.read_csv("../src/data/raw/fed_speeches.csv")
+# Load Fed communication datasets
+def load_events(statements_path, minutes_path, speeches_path):
 
-statements["event_type"] = "statement"
-minutes["event_type"] = "minutes"
-speeches["event_type"] = "speech"
+    statements = pd.read_csv(statements_path)
+    minutes = pd.read_csv(minutes_path)
+    speeches = pd.read_csv(speeches_path)
 
-# concatenate the dfs into a single one
-events = pd.concat([statements, minutes, speeches])
+    statements["event_type"] = "statement"
+    minutes["event_type"] = "minutes"
+    speeches["event_type"] = "speech"
 
-# convert the date to datetime and sort the df by the date of different fed events
-events["date"] = pd.to_datetime(events["date"], format="mixed")
-events["date"] = events["date"].dt.normalize()
-events = events.sort_values("date").reset_index(drop=True)
+    events = pd.concat([statements, minutes, speeches], ignore_index=True)
 
-# load the market data
-market = pd.read_csv("../src/data/raw/market_data.csv")
-market["date"] = pd.to_datetime(market["Date"])
-market = market.sort_values("date").reset_index(drop=True)
+    events["date"] = pd.to_datetime(events["date"], format="mixed")
+    events["date"] = events["date"].dt.normalize()
+
+    events = events.sort_values("date").reset_index(drop=True)
+
+    return events
 
 
-# align the fed event to a trading day and if it occurs on a day where market is closed, align it to the next trading day
+
+# Load market data
+def load_market_data(market_path):
+
+    market = pd.read_csv(market_path)
+
+    market["date"] = pd.to_datetime(market["Date"])
+
+    market = market.sort_values("date").reset_index(drop=True)
+
+    # forward fill treasury yields
+    market["treasury_10y"] = market["treasury_10y"].ffill()
+    market["treasury_2y"] = market["treasury_2y"].ffill()
+
+    return market
+
+
+
+# Align event to next trading day
 def align_to_trading_day(event_date, market_dates):
 
     if event_date in market_dates.values:
@@ -33,75 +47,104 @@ def align_to_trading_day(event_date, market_dates):
 
     future_dates = market_dates[market_dates > event_date]
 
+    if len(future_dates) == 0:
+        return pd.NaT
+
     return future_dates.iloc[0]
 
-events["aligned_date"] = events["date"].apply(
-    lambda d: align_to_trading_day(d, market["date"])
-)
 
-# create event windows:
-# estimation window: t-65 days to t-5 days for normal market behaviour
-# event window: t=0 to t+30 days for changes due to fed events
+def align_events(events, market):
+
+    events["aligned_date"] = events["date"].apply(
+        lambda d: align_to_trading_day(d, market["date"])
+    )
+
+    events = events.dropna(subset=["aligned_date"])
+
+    # ensure full estimation and event windows exist
+    events = events[
+        (events["aligned_date"] >= market["date"].iloc[65]) &
+        (events["aligned_date"] <= market["date"].iloc[-31])
+    ]
+
+    return events
+
+
+
+# Extract event and estimation windows
 def extract_event_window(event_date, market):
 
     idx = market.index[market["date"] == event_date][0]
 
-    estimation_window = market.iloc[idx-65: idx-5]
-    event_window = market.iloc[idx: idx+31]
+    estimation_window = market.iloc[idx - 65: idx - 5]
+    event_window = market.iloc[idx: idx + 31]
 
     return estimation_window, event_window
 
 
-# generate a df for all the events
-event_windows = []
+def generate_event_windows(events, market):
 
-for i, row in events.iterrows():
+    event_windows = []
+    estimation_windows = []
 
-    event_date = row["aligned_date"]
+    for i, row in events.iterrows():
 
-    try:
-        est_win, evt_win = extract_event_window(event_date, market)
+        event_date = row["aligned_date"]
 
-        evt_win = evt_win.copy()
+        try:
 
-        evt_win["t"] = range(0, len(evt_win))
-        evt_win["event_id"] = i
-        evt_win["event_date"] = event_date
+            est_win, evt_win = extract_event_window(event_date, market)
 
-        event_windows.append(evt_win)
+            evt_win = evt_win.copy()
+            evt_win["t"] = range(0, len(evt_win))
+            evt_win["event_id"] = i
+            evt_win["event_date"] = event_date
 
-    except:
-        continue
+            est_win = est_win.copy()
+            est_win["event_id"] = i
+            est_win["event_date"] = event_date
 
-event_windows_df = pd.concat(event_windows)
+            event_windows.append(evt_win)
+            estimation_windows.append(est_win)
 
-# a df for estimation 
-estimation_windows = []
+        except:
+            continue
 
-for i, row in events.iterrows():
+    event_windows_df = pd.concat(event_windows)
+    estimation_df = pd.concat(estimation_windows)
 
-    event_date = row["aligned_date"]
+    return event_windows_df, estimation_df
 
-    try:
 
-        est_win, evt_win = extract_event_window(event_date, market)
 
-        est_win = est_win.copy()
+# Save processed datasets
+def save_outputs(events, event_windows_df, estimation_df):
 
-        est_win["event_id"] = i
-        est_win["event_date"] = event_date
+    event_windows_df.to_csv("../../data/processed/events_window.csv", index=False)
+    events.to_csv("../../data/processed/events_all.csv", index=False)
+    estimation_df.to_csv("../../data/processed/estimation_window.csv", index=False)
 
-        estimation_windows.append(est_win)
 
-    except:
-        continue
 
-estimation_df = pd.concat(estimation_windows)
+# Main pipeline
+def main():
 
-# forward fill the treasury data since it doesnt change value directly
-market["treasury_10y"] = market["treasury_10y"].ffill()
-market["treasury_2y"] = market["treasury_2y"].ffill()
+    events = load_events(
+        "../src/data/raw/fomc_statements.csv",
+        "../src/data/raw/fomc_minutes.csv",
+        "../src/data/raw/fed_speeches.csv"
+    )
 
-event_windows_df.to_csv('../../data/processed/events_window.csv', index=False)
-events.to_csv('../../data/processed/events_all.csv', index=False)
-estimation_df.to_csv('../../data/processed/estimation_window.csv', index=False)
+    market = load_market_data("../src/data/raw/market_data.csv")
+
+    events = align_events(events, market)
+
+    event_windows_df, estimation_df = generate_event_windows(events, market)
+
+    save_outputs(events, event_windows_df, estimation_df)
+
+    print("Event alignment and window extraction completed.")
+
+
+if __name__ == "__main__":
+    main()
