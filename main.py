@@ -1,7 +1,7 @@
 from src.modules.scraper import run_scraper
 from src.modules.market import run_market_pipeline
 from src.modules.align import align_market_with_fedevents
-from src.modules.abnormal_returns import calc_abnormal_returns
+# from src.modules.abnormal_returns import calc_abnormal_returns
 import time
 
 if __name__ == "__main__":
