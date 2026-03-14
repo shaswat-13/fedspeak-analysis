@@ -101,3 +101,7 @@ estimation_df = pd.concat(estimation_windows)
 # forward fill the treasury data since it doesnt change value directly
 market["treasury_10y"] = market["treasury_10y"].ffill()
 market["treasury_2y"] = market["treasury_2y"].ffill()
+
+event_windows_df.to_csv('../../data/processed/events_window.csv', index=False)
+events.to_csv('../../data/processed/events_all.csv', index=False)
+estimation_df.to_csv('../../data/processed/estimation_window.csv', index=False)
