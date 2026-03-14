@@ -19,6 +19,7 @@ cycler==0.12.1
 cymem==2.0.13
 debugpy==1.8.20
 decorator==5.2.1
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85
 executing==2.2.1
 fonttools==4.61.1
 frozendict==2.4.7

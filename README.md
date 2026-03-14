@@ -4,9 +4,9 @@
 
 ---
 
-## 🧭 Overview
+## Overview
 
-**FedSpeak** refers to the deliberately calibrated — and often ambiguous — language used by Federal Reserve officials to manage investor expectations without triggering market volatility. FOMC statements, meeting minutes, and Chair speeches are not merely informational: they are instruments of monetary policy transmission.
+**FedSpeak** refers to the deliberately calibrated, and often ambiguous, language used by Federal Reserve officials to manage investor expectations without triggering market volatility. FOMC statements, meeting minutes, and Chair speeches are not merely informational: they are instruments of monetary policy transmission.
 
 This project systematically converts Fed communication into a numerical **policy-tone signal** (Hawkish / Dovish / Neutral), then measures how strongly that signal correlates with financial market reactions across 17 years of economic history — from the 2008 financial crisis through the post-COVID inflation cycle.
 
@@ -14,7 +14,7 @@ This project systematically converts Fed communication into a numerical **policy
 
 ---
 
-## 🗂️ Pipeline Overview
+## Pipeline Overview
 
 The project is organized into **six sequential stages**:
 
@@ -34,7 +34,7 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 ---
 
-## ⚙️ Stage-by-Stage Walkthrough
+## Stage-by-Stage Walkthrough
 
 ---
 
