@@ -46,10 +46,10 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 | Document Type | Count | Frequency |
 |---|---|---|
-| FOMC Statements | ~136 | 8 per year |
-| FOMC Meeting Minutes | ~136 | Released ~3 weeks post-meeting |
-| Fed Chair Speeches | ~283 | Variable |
-| **Total** | **~555** | **2008–2025** |
+| FOMC Statements | 152 | 8 per year |
+| FOMC Meeting Minutes | 161 | Released ~3 weeks post-meeting |
+| Fed Chair Speeches | 105 | Variable |
+| **Total** | **418** | **2008–2025** |
 
 **Why these documents?** These three categories represent the primary channels through which the Fed communicates monetary policy stance to the public. Statements convey immediate policy decisions; minutes reveal deliberation depth; speeches allow the Chair to signal future direction informally.
 
@@ -102,10 +102,6 @@ Raw Fed documents undergo a five-stage cleaning and normalization process before
 | Stopword Removal | Remove NLTK stopwords; **retain** domain terms | Terms like `inflation`, `rate`, `accommodative` are signals, not noise |
 
 **Why retain financial terms from stopword removal?** Standard NLP stopword lists remove very common words. In Fed documents, frequent terms like *inflation*, *rate*, and *monetary* are exactly what carries policy signal — blindly removing them would destroy information.
-
-**Preprocessing statistics:**
-- Average document length: 1,247 tokens (SD: 634)
-- Vocabulary post-preprocessing: 4,892 unique lemmatized terms
 
 #### 3b. Sentiment Scoring — FinBERT
 
@@ -216,7 +212,7 @@ Parameters α and β estimated on the estimation window using Ordinary Least Squ
 #### Abnormal Return
 
 ```
-AR_t = R_t − (α̂ + β̂ × R_{m,t})
+AR_t = R_t − (α̂ + β̂ × R_{m,t}) #######################################################################
 ```
 
 The difference between what the market *actually* returned and what the model *predicted* it should return based on history.
@@ -288,32 +284,33 @@ Tests whether past policy tone scores carry *additional* predictive information 
 
 ---
 
-## 🧰 Technology Stack
+## Technology Stack
 
 | Task | Library |
 |---|---|
-| Web scraping | `BeautifulSoup`, `Selenium` |
+| Web scraping | `BeautifulSoup`, `Requests` |
 | Text processing | `spaCy`, `NLTK`, `scikit-learn` |
 | Sentiment / NLP | `transformers` (HuggingFace), `ProsusAI/finbert` |
 | Data manipulation | `pandas`, `numpy` |
 | Market data | `yfinance` |
 | Statistical analysis | `scipy.stats`, `statsmodels` |
-| Visualization | `matplotlib`, `seaborn`, `plotly` |
+| Visualization | `matplotlib`, `seaborn` |
 
 ---
 
-## 📦 Installation
+##  Installation
 
 ```bash
-git clone https://github.com/your-username/fedspeak.git
-cd fedspeak
+git clone https://github.com/shaswat-13/fedspeak-analysis.git
+cd fedspeak-analysis
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
 ---
 
-## 🚀 Running the Pipeline
+#############################################################################33
+## Running the Pipeline 
 
 To run the full pipeline end-to-end:
 ```bash
@@ -330,27 +327,9 @@ python src/5_tone_classifier.py
 python src/6_event_study.py
 python src/7_statistics.py
 ```
-
-> **Reproducibility:** Random seeds 42, 77, and 123 are set at pipeline initialization. All results should be exactly reproducible across runs.
-
 ---
 
-## 🔀 Data Split Strategy
-
-To prevent temporal leakage and simulate real-world deployment:
-
-| Split | Period | Events |
-|---|---|---|
-| Training set | Jan 2008 – Dec 2018 | 374 events |
-| Test set | Jan 2019 – Dec 2025 | 181 events |
-
-Cross-validation uses **5-fold time-series CV** (chronologically sequential, no shuffling) to preserve temporal ordering and prevent look-ahead bias.
-
-A separate **holdout set** excludes crisis periods (2008–2009 GFC, Q1-Q3 2020 COVID) to test whether findings generalize across different market volatility regimes.
-
----
-
-## 📄 Citation
+## Citation
 
 If you use this work, please cite:
 
@@ -362,7 +341,7 @@ Department of Electronics and Computer Engineering, Thapathali Campus, Kathmandu
 
 ---
 
-## 📚 References
+## References
 
 - Gentzkow, M. et al. (2019). Text as data. *Journal of Economic Literature*.
 - Fama, E. F. et al. (1969). Adjustment of stock prices to new information. *International Economic Review*.
@@ -373,4 +352,8 @@ Department of Electronics and Computer Engineering, Thapathali Campus, Kathmandu
 
 ---
 
-*Built by Prayush Bikram Khadka, Shaswat Sharma, and Rajad Shakya — Thapathali Campus, Kathmandu, Nepal.*
+*Authors:*
+
+*Prayush Bikram Khadka*
+*Shaswat Sharma*
+
