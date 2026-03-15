@@ -1,0 +1,10 @@
+metric,value,ci,p_value,n,significant
+Pearson r (CAR_0_3),0.0087,"[-0.0897, 0.1069]",0.8625,398,False
+Spearman rho (CAR_0_3),-0.0321,,0.5227,398,False
+Pearson r (CAR_0_10),0.1086,"[0.0104, 0.2047]",0.0303,398,True
+Spearman rho (CAR_0_10),0.0303,,0.5472,398,False
+Pearson r (CAR_0_30),0.042,"[-0.0565, 0.1397]",0.4033,398,False
+Spearman rho (CAR_0_30),0.0038,,0.9405,398,False
+Directional Accuracy (CAR_0_3),45.73,,0.9604,398,False
+Cohen's d: hawkish vs dovish (CAR_0_3),0.0971,,0.7494,185,False
+Point-biserial r (CAR_0_3),0.0296,,0.689,185,False
