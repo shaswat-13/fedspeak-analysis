@@ -1,6 +1,6 @@
 # Quantifying FedSpeak: Sentiment Analysis of Federal Reserve Communication and Market Reactions (2008–2025)
 
-> *How does the Fed's choice of words move financial markets? This project builds a full NLP + econometrics pipeline to find out.*
+> _How does the Fed's choice of words move financial markets? This project builds a full NLP + econometrics pipeline to find out._
 
 ---
 
@@ -10,7 +10,7 @@
 
 This project systematically converts Fed communication into a numerical **policy-tone signal** (Hawkish / Dovish / Neutral), then measures how strongly that signal correlates with financial market reactions across 17 years of economic history — from the 2008 financial crisis through the post-COVID inflation cycle.
 
-**Core question:** *Does the tone of what the Fed says predict how markets move?*
+**Core question:** _Does the tone of what the Fed says predict how markets move?_
 
 ---
 
@@ -44,12 +44,12 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 **Documents collected (2008–2025):**
 
-| Document Type | Count | 
-|---|---|---|
-| FOMC Statements | 151 | 
-| FOMC Meeting Minutes | 161 | 
-| Fed Chair Speeches | 104 | 
-| **Total** | **416** | 
+| Document Type        | Count   |
+| -------------------- | ------- |
+| FOMC Statements      | 151     |
+| FOMC Meeting Minutes | 161     |
+| Fed Chair Speeches   | 104     |
+| **Total**            | **416** |
 
 **Why these documents?** These three categories represent the primary channels through which the Fed communicates monetary policy stance to the public. Statements convey immediate policy decisions; minutes reveal deliberation depth; speeches allow the Chair to signal future direction informally.
 
@@ -67,15 +67,15 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 **Variables collected:**
 
-| Category | Variables | Rationale |
-|---|---|---|
-| S&P 500 | Open, High, Low, Close, Volume, Log Returns | Primary equity market proxy |
-| Volatility | VIX (implied), Realized Volatility (20-day rolling σ) | Measures uncertainty response |
-| Interest Rates | 10Y Treasury, 2Y Treasury | Direct transmission channels |
+| Category       | Variables                                             | Rationale                     |
+| -------------- | ----------------------------------------------------- | ----------------------------- |
+| S&P 500        | Open, High, Low, Close, Volume, Log Returns           | Primary equity market proxy   |
+| Volatility     | VIX (implied), Realized Volatility (20-day rolling σ) | Measures uncertainty response |
+| Interest Rates | 10Y Treasury, 2Y Treasury                             | Direct transmission channels  |
 
 **Why log returns?** Log returns (`r_t = ln(P_t / P_{t-1})`) are used instead of simple returns because they are time-additive, approximately normally distributed, and standard in financial econometrics.
 
-**Why VIX alongside realized volatility?** VIX captures *forward-looking* market fear (implied by options prices), while realized volatility captures *historical* price fluctuation. Using both gives a fuller picture of how Fed communication affects uncertainty.
+**Why VIX alongside realized volatility?** VIX captures _forward-looking_ market fear (implied by options prices), while realized volatility captures _historical_ price fluctuation. Using both gives a fuller picture of how Fed communication affects uncertainty.
 
 **Why the 2Y/10Y yield spread?** The spread between short- and long-term Treasury yields is a closely watched recession signal and a direct indicator of how the market interprets future Fed rate paths.
 
@@ -89,15 +89,15 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 Raw Fed documents undergo a five-stage cleaning and normalization process before NLP analysis:
 
-| Stage | Action | Rationale |
-|---|---|---|
-| Cleaning | Remove headers, HTML tags, non-ASCII characters | Eliminate noise not part of policy language |
-| Sentence Segmentation | `spaCy` (`en_core_web_sm`) | Enables sentence-level FinBERT scoring |
-| Tokenization | `spaCy` tokenizer; preserve numbers & percentages | Figures like "4.5%" carry policy meaning |
-| Lemmatization | Reduce inflected forms (`tightening` → `tighten`) | Reduces sparsity; improves keyword matching |
-| Stopword Removal | Remove NLTK stopwords; **retain** domain terms | Terms like `inflation`, `rate`, `accommodative` are signals, not noise |
+| Stage                 | Action                                            | Rationale                                                              |
+| --------------------- | ------------------------------------------------- | ---------------------------------------------------------------------- |
+| Cleaning              | Remove headers, HTML tags, non-ASCII characters   | Eliminate noise not part of policy language                            |
+| Sentence Segmentation | `spaCy` (`en_core_web_sm`)                        | Enables sentence-level FinBERT scoring                                 |
+| Tokenization          | `spaCy` tokenizer; preserve numbers & percentages | Figures like "4.5%" carry policy meaning                               |
+| Lemmatization         | Reduce inflected forms (`tightening` → `tighten`) | Reduces sparsity; improves keyword matching                            |
+| Stopword Removal      | Remove NLTK stopwords; **retain** domain terms    | Terms like `inflation`, `rate`, `accommodative` are signals, not noise |
 
-**Why retain financial terms from stopword removal?** Standard NLP stopword lists remove very common words. In Fed documents, frequent terms like *inflation*, *rate*, and *monetary* are exactly what carries policy signal — blindly removing them would destroy information.
+**Why retain financial terms from stopword removal?** Standard NLP stopword lists remove very common words. In Fed documents, frequent terms like _inflation_, _rate_, and _monetary_ are exactly what carries policy signal — blindly removing them would destroy information.
 
 #### 3b. Sentiment Scoring — FinBERT
 
@@ -106,6 +106,7 @@ Raw Fed documents undergo a five-stage cleaning and normalization process before
 **Why FinBERT over generic BERT or lexicon methods?** Generic sentiment models (trained on movie reviews or social media) fail to capture the nuanced, domain-specific language of central banking. FinBERT's pre-training on financial text allows it to distinguish, for example, between "patient" (dovish signal) and "measured" (can be either), which lexicon methods cannot reliably do.
 
 **Sentence-level workflow:**
+
 1. Segment document into sentences
 2. Pass each sentence through FinBERT (max 512 tokens)
 3. Apply softmax normalization: `p_i = exp(logit_i) / Σ exp(logit_j)`
@@ -113,11 +114,11 @@ Raw Fed documents undergo a five-stage cleaning and normalization process before
 
 **Output classes:**
 
-| FinBERT Label | Policy Interpretation |
-|---|---|
-| Positive | Dovish / Accommodative |
-| Neutral | Balanced / Uncertain |
-| Negative | Hawkish / Restrictive |
+| FinBERT Label | Policy Interpretation  |
+| ------------- | ---------------------- |
+| Positive      | Dovish / Accommodative |
+| Neutral       | Balanced / Uncertain   |
+| Negative      | Hawkish / Restrictive  |
 
 **Document-level aggregation:** Arithmetic mean of all sentence-level probability scores. Sensitivity checks run with confidence-weighted aggregation (higher-confidence sentences weighted more).
 
@@ -135,11 +136,12 @@ Raw Fed documents undergo a five-stage cleaning and normalization process before
 
 #### Keyword Lexicon (47 domain-specific terms)
 
-**Hawkish keywords (24):** *restrictive, tightening, elevated, pressure, headwinds, above-target, inflation, rate hikes, firm, aggressive, restraint, frontloaded, warranted, urgency, appropriate, imperative, ...*
+**Hawkish keywords (24):** _restrictive, tightening, elevated, pressure, headwinds, above-target, inflation, rate hikes, firm, aggressive, restraint, frontloaded, warranted, urgency, appropriate, imperative, ..._
 
-**Dovish keywords (23):** *accommodative, support, downside risks, slack, uncertainty, patient, gradual, transitory, flexibility, temporary, manageable, cautious, buffer, safeguard, insurance, ...*
+**Dovish keywords (23):** _accommodative, support, downside risks, slack, uncertainty, patient, gradual, transitory, flexibility, temporary, manageable, cautious, buffer, safeguard, insurance, ..._
 
 Keyword frequencies normalized by document length:
+
 ```
 hawkish_freq = (count of hawkish terms) / (total tokens)
 dovish_freq  = (count of dovish terms)  / (total tokens)
@@ -160,11 +162,11 @@ where:
 
 #### Classification Thresholds
 
-| Tone Score | Policy Stance |
-|---|---|
-| > +0.2 | 🔴 Hawkish |
-| < −0.2 | 🟢 Dovish |
-| −0.2 to +0.2 | 🟡 Neutral |
+| Tone Score   | Policy Stance |
+| ------------ | ------------- |
+| > +0.2       | 🔴 Hawkish    |
+| < −0.2       | 🟢 Dovish     |
+| −0.2 to +0.2 | 🟡 Neutral    |
 
 #### Confidence Score
 
@@ -190,12 +192,12 @@ High confidence = strong tone signal AND low model uncertainty. Used in downstre
 
 #### Event Windows
 
-| Window | Period | Purpose |
-|---|---|---|
-| Estimation window | t−65 to t−5 | Estimate baseline market behavior (60 trading days, ~3 months) |
-| Pre-event buffer | t−5 to t−1 | Excluded to avoid anticipation effects contaminating baseline |
-| Immediate reaction | t=0 to t=3 | First 3 trading days after announcement |
-| Event window | t=0 to t=30 | Full one-month market adjustment |
+| Window             | Period      | Purpose                                                        |
+| ------------------ | ----------- | -------------------------------------------------------------- |
+| Estimation window  | t−65 to t−5 | Estimate baseline market behavior (60 trading days, ~3 months) |
+| Pre-event buffer   | t−5 to t−1  | Excluded to avoid anticipation effects contaminating baseline  |
+| Immediate reaction | t=0 to t=3  | First 3 trading days after announcement                        |
+| Event window       | t=0 to t=30 | Full one-month market adjustment                               |
 
 #### Normal Return Model (OLS)
 
@@ -211,7 +213,7 @@ Parameters α and β estimated on the estimation window using Ordinary Least Squ
 AR_t = R_t − (α̂ + β̂ × R_{m,t}) #######################################################################
 ```
 
-The difference between what the market *actually* returned and what the model *predicted* it should return based on history.
+The difference between what the market _actually_ returned and what the model _predicted_ it should return based on history.
 
 #### Cumulative Abnormal Return (CAR)
 
@@ -220,6 +222,7 @@ CAR[t1, t2] = Σ AR_t  for t in [t1, t2]
 ```
 
 **CARs calculated for:**
+
 - `CAR(0,3)` — Immediate reaction
 - `CAR(0,10)` — Two-week window
 - `CAR(0,30)` — One-month window
@@ -228,9 +231,9 @@ CAR[t1, t2] = Σ AR_t  for t in [t1, t2]
 
 Two measures of volatility response calculated alongside returns:
 
-| Measure | Definition |
-|---|---|
-| Excess VIX | `Mean(VIX[0,3]) − Mean(VIX[−65,−5])` |
+| Measure                    | Definition                           |
+| -------------------------- | ------------------------------------ |
+| Excess VIX                 | `Mean(VIX[0,3]) − Mean(VIX[−65,−5])` |
 | Excess Realized Volatility | `Mean(RV[0,20]) − Mean(RV[−65,−20])` |
 
 ---
@@ -239,7 +242,7 @@ Two measures of volatility response calculated alongside returns:
 
 **What:** Test whether policy tone scores are statistically associated with market reactions, and whether this relationship holds across different economic conditions.
 
-**Why not a predictive ML model?** With only 8 FOMC meetings per year, supervised machine learning would be severely data-constrained. A correlation and causal inference framework is more appropriate, more interpretable, and directly answers the research question: *does tone influence markets?*
+**Why not a predictive ML model?** With only 8 FOMC meetings per year, supervised machine learning would be severely data-constrained. A correlation and causal inference framework is more appropriate, more interpretable, and directly answers the research question: _does tone influence markets?_
 
 #### Primary Statistical Methods
 
@@ -248,6 +251,7 @@ Tests linear (Pearson) and monotonic (Spearman) relationships between tone score
 
 **2. Directional Consistency Analysis**
 Measures what percentage of events produced economically expected market movements:
+
 - Hawkish tone → negative CAR ✓
 - Dovish tone → positive CAR ✓
 - Neutral tone → |CAR| < 1% ✓
@@ -255,46 +259,46 @@ Measures what percentage of events produced economically expected market movemen
 Baseline = 50% (random). Target > 55%.
 
 **3. Granger Causality Test**
-Tests whether past policy tone scores carry *additional* predictive information for future returns beyond what past returns alone can predict. Run using `statsmodels`; significance threshold p < 0.05.
+Tests whether past policy tone scores carry _additional_ predictive information for future returns beyond what past returns alone can predict. Run using `statsmodels`; significance threshold p < 0.05.
 
 **4. Robustness Checks**
 
-| Check | Method |
-|---|---|
-| Time-stability | Rolling 252-day (1-year) correlation windows |
-| Crisis vs. normal markets | Separate correlations for 2008–2009 and COVID-19 periods |
-| Volatility regimes | Separate analyses for VIX > 75th percentile and VIX < 25th percentile |
-| Window sensitivity | Correlations for CAR(0,1), CAR(0,5), CAR(0,10), CAR(0,30) |
-| Confounders | Partial correlations controlling for CPI surprises, unemployment reports, rate changes |
+| Check                     | Method                                                                                 |
+| ------------------------- | -------------------------------------------------------------------------------------- |
+| Time-stability            | Rolling 252-day (1-year) correlation windows                                           |
+| Crisis vs. normal markets | Separate correlations for 2008–2009 and COVID-19 periods                               |
+| Volatility regimes        | Separate analyses for VIX > 75th percentile and VIX < 25th percentile                  |
+| Window sensitivity        | Correlations for CAR(0,1), CAR(0,5), CAR(0,10), CAR(0,30)                              |
+| Confounders               | Partial correlations controlling for CPI surprises, unemployment reports, rate changes |
 
 #### Evaluation Metrics Summary
 
-| Metric | Purpose |
-|---|---|
-| Pearson / Spearman ρ | Relationship strength between tone and returns |
-| p-value (< 0.05) | Statistical significance |
-| Directional Accuracy | How often market moves in expected direction |
-| Granger F-statistic | Whether tone adds predictive information for returns |
-| Cohen's d | Effect size between hawkish vs. dovish return distributions |
-| 95% Confidence Intervals | Reliability bounds on correlations (Fisher z-transform) |
+| Metric                   | Purpose                                                     |
+| ------------------------ | ----------------------------------------------------------- |
+| Pearson / Spearman ρ     | Relationship strength between tone and returns              |
+| p-value (< 0.05)         | Statistical significance                                    |
+| Directional Accuracy     | How often market moves in expected direction                |
+| Granger F-statistic      | Whether tone adds predictive information for returns        |
+| Cohen's d                | Effect size between hawkish vs. dovish return distributions |
+| 95% Confidence Intervals | Reliability bounds on correlations (Fisher z-transform)     |
 
 ---
 
 ## Technology Stack
 
-| Task | Library |
-|---|---|
-| Web scraping | `BeautifulSoup`, `Requests` |
-| Text processing | `spaCy`, `NLTK`, `scikit-learn` |
-| Sentiment / NLP | `transformers` (HuggingFace), `ProsusAI/finbert` |
-| Data manipulation | `pandas`, `numpy` |
-| Market data | `yfinance` |
-| Statistical analysis | `scipy.stats`, `statsmodels` |
-| Visualization | `matplotlib`, `seaborn` |
+| Task                 | Library                                          |
+| -------------------- | ------------------------------------------------ |
+| Web scraping         | `BeautifulSoup`, `Requests`                      |
+| Text processing      | `spaCy`, `NLTK`, `scikit-learn`                  |
+| Sentiment / NLP      | `transformers` (HuggingFace), `ProsusAI/finbert` |
+| Data manipulation    | `pandas`, `numpy`                                |
+| Market data          | `yfinance`                                       |
+| Statistical analysis | `scipy.stats`, `statsmodels`                     |
+| Visualization        | `matplotlib`, `seaborn`                          |
 
 ---
 
-##  Installation
+## Installation
 
 ```bash
 git clone https://github.com/shaswat-13/fedspeak-analysis.git
@@ -305,24 +309,26 @@ python -m spacy download en_core_web_sm
 
 ---
 
-#############################################################################33
-## Running the Pipeline 
+## Running the Pipeline
 
 To run the full pipeline end-to-end:
+
 ```bash
-python run_pipeline.py
+python3 main.py
 ```
 
 Or run individual stages:
+
 ```bash
-python src/1_scraper.py
-python src/2_market_data.py
-python src/3_preprocessing.py
-python src/4_sentiment.py
-python src/5_tone_classifier.py
-python src/6_event_study.py
-python src/7_statistics.py
+python3 src/modules/s1_scraper.py
+python3 src/modules/s2_market.py
+python3 src/modules/s3_align.py
+python3 src/modules/s4_preprocessing.py
+python3 src/modules/s5_sentiment_analysis.py
+python3 src/modules/s6_abnormal_returns_study.py
+python3 src/modules/s7_statistical_evaluation.py
 ```
+
 ---
 
 ## Citation
@@ -339,17 +345,16 @@ Department of Electronics and Computer Engineering, Thapathali Campus, Kathmandu
 
 ## References
 
-- Gentzkow, M. et al. (2019). Text as data. *Journal of Economic Literature*.
-- Fama, E. F. et al. (1969). Adjustment of stock prices to new information. *International Economic Review*.
-- MacKinlay, A. C. (1997). Event studies in economics and finance. *Journal of Economic Literature*.
+- Gentzkow, M. et al. (2019). Text as data. _Journal of Economic Literature_.
+- Fama, E. F. et al. (1969). Adjustment of stock prices to new information. _International Economic Review_.
+- MacKinlay, A. C. (1997). Event studies in economics and finance. _Journal of Economic Literature_.
 - Arshad, A. The role of Fed speech sentiment signals in shaping US market response. NUST Business School.
 - Ahrens, M. et al. (2024). Mind your language: Market responses to central bank speeches. FRB St. Louis Working Paper 2023-013.
 - Czudaj, R. (2025). ECB's central bank communication and monetary policy transmission.
 
 ---
 
-*Authors:*
+_Authors:_
 
-*Prayush Bikram Khadka*
-*Shaswat Sharma*
-
+_Prayush Bikram Khadka_
+_Shaswat Sharma_
