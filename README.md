@@ -79,11 +79,7 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 **Why the 2Y/10Y yield spread?** The spread between short- and long-term Treasury yields is a closely watched recession signal and a direct indicator of how the market interprets future Fed rate paths.
 
-**Alignment logic:**
-- FOMC announcements released **before market close (14:00 UTC)**: market reaction measured same day (t=0)
-- Announcements released **after market close**: reaction measured from next trading day (t=1)
-
-**Total:** 4,276 trading days across the study period, zero missing values after forward-fill imputation of Treasury yield data.
+**Total:** 4,549 trading days across the study period, zero missing values after forward-fill imputation of Treasury yield data.
 
 ---
 
