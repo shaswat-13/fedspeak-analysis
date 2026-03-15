@@ -3,7 +3,7 @@ from src.modules.s2_market import run_market_pipeline
 from src.modules.s3_align import align_market_with_fedevents
 from src.modules.s4_preprocessing import run_preprocessing_pipeline
 from src.modules.s5_sentiment_analysis import run_sentiment_analysis_pipeline
-# from src.modules.abnormal_returns import calc_abnormal_returns
+from src.modules.s6_abnormal_returns_study import run_event_study
 from src.modules.s7_statistical_evaluation import run_statistical_evaluation
 
 if __name__ == "__main__":
@@ -44,13 +44,11 @@ if __name__ == "__main__":
     print("-"*80)
 
     # calculate abnormal returns
-    # abnorm_s = time.time()
-    # calc_abnormal_returns()
-    # abnorm_e = time.time()
+    run_event_study()
 
-    # print("-"*80)
-    # print("Abnormality Returns Calculated Successfully")
-    # print("-"*80)
+    print("-"*80)
+    print("Abnormality Returns Calculated Successfully")
+    print("-"*80)
 
     # Run Statistical Evaluation
     run_statistical_evaluation()
