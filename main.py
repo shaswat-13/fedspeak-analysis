@@ -1,10 +1,10 @@
-from src.modules.scraper import run_scraper
-from src.modules.market import run_market_pipeline
-from src.modules.align import align_market_with_fedevents
+from src.modules.s1_scraper import run_scraper
+from src.modules.s2_market import run_market_pipeline
+from src.modules.s3_align import align_market_with_fedevents
+from src.modules.s4_preprocessing import run_preprocessing_pipeline
+from src.modules.s5_sentiment_analysis import run_sentiment_analysis_pipeline
 # from src.modules.abnormal_returns import calc_abnormal_returns
-from src.modules.preprocessing import run_preprocessing_pipeline
 
-import time
 
 if __name__ == "__main__":
 
@@ -34,6 +34,13 @@ if __name__ == "__main__":
 
     print("-"*80)
     print("Pre Processing Completed")
+    print("-"*80)
+
+    # Run Sentiment analysis
+    run_sentiment_analysis_pipeline()
+
+    print("-"*80)
+    print("Sentiment Analysis Completed")
     print("-"*80)
 
     # calculate abnormal returns
