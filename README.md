@@ -42,14 +42,14 @@ Stage 6: Statistical Evaluation & Robustness Testing
 
 **What:** Automated collection of Federal Reserve textual communications from the [Federal Reserve Board's official website](https://www.federalreserve.gov).
 
-**Documents collected:**
+**Documents collected (2008–2025):**
 
-| Document Type | Count | Frequency |
+| Document Type | Count | 
 |---|---|---|
-| FOMC Statements | 152 | 8 per year |
-| FOMC Meeting Minutes | 161 | Released ~3 weeks post-meeting |
-| Fed Chair Speeches | 105 | Variable |
-| **Total** | **418** | **2008–2025** |
+| FOMC Statements | 151 | 
+| FOMC Meeting Minutes | 161 | 
+| Fed Chair Speeches | 104 | 
+| **Total** | **416** | 
 
 **Why these documents?** These three categories represent the primary channels through which the Fed communicates monetary policy stance to the public. Statements convey immediate policy decisions; minutes reveal deliberation depth; speeches allow the Chair to signal future direction informally.
 

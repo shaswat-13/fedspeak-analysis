@@ -14,7 +14,6 @@ SPEECH_URL = "https://www.federalreserve.gov/json/ne-speeches.json"
 
 
 # Fetch JSON
-
 def fetch_json(url):
     r = requests.get(url)
     r.raise_for_status()
@@ -23,7 +22,6 @@ def fetch_json(url):
 
 
 # Fetch page content
-
 def fetch_text(url, css_class):
 
     try:
@@ -42,9 +40,22 @@ def fetch_text(url, css_class):
         return None
 
 
+# limit the data to the specified timeframe
+def validate_date(df):
+    start_date = '2008-01-01'
+    end_date = '2025-12-31'
+
+    print(f'Before: {len(df)}')
+    df['date'] = pd.to_datetime(df['date'])
+
+    mask = (df['date'] >= start_date) & (df['date'] <= end_date)
+    df = df.loc[mask].copy()
+
+    print(f'After: {len(df)}')
+    return df
+
 
 # Worker function for statements
-
 def scrape_statement_worker(statement):
 
     if "url" in statement:
@@ -66,7 +77,6 @@ def scrape_statement_worker(statement):
 
 
 # Scrape statements (parallel)
-
 def scrape_statements(hist_data, recent_data):
 
     hist_statements = [
@@ -100,15 +110,13 @@ def scrape_statements(hist_data, recent_data):
             print(f"Processed {i+1}/{len(statements)} statements")
 
     df = pd.DataFrame(results)
-
+    df = validate_date(df)
     df.to_csv("data/raw/fomc_statements.csv", index=False)
 
     return df
 
 
-
 # Worker function for minutes
-
 def scrape_minutes_worker(item):
 
     if "url" in item:
@@ -130,7 +138,6 @@ def scrape_minutes_worker(item):
 
 
 # Scrape minutes (parallel)
-
 def scrape_minutes(hist_data, recent_data):
 
     hist_minutes = [
@@ -164,7 +171,7 @@ def scrape_minutes(hist_data, recent_data):
             print(f"Processed {i+1}/{len(minutes)} minutes")
 
     df = pd.DataFrame(results)
-
+    df = validate_date(df)
     df.to_csv("data/raw/fomc_minutes.csv", index=False)
 
     return df
@@ -172,7 +179,6 @@ def scrape_minutes(hist_data, recent_data):
 
 
 # Worker function for speeches
-
 def scrape_speech_worker(speech):
 
     full_url = BASE_URL + speech["l"]
@@ -190,7 +196,6 @@ def scrape_speech_worker(speech):
 
 
 # Scrape speeches (parallel)
-
 def scrape_speeches():
 
     r = requests.get(SPEECH_URL)
@@ -227,7 +232,7 @@ def scrape_speeches():
             print(f"Processed {i+1}/{len(filtered)} speeches")
 
     df = pd.DataFrame(results)
-
+    df = validate_date(df)
     df.to_csv("data/raw/fed_speeches.csv", index=False)
 
     return df
