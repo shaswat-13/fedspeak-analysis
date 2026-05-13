@@ -12,7 +12,7 @@ This project systematically converts Fed communication into a numerical **policy
 
 **Core question:** _Does the tone of what the Fed says predict how markets move?_
 
-[**Link to paper:**](https://drive.google.com/file/d/15qNgiOZ4kf3RwoXqTrWATdsml5Y4N-DM/view?usp=sharing)
+[**Link to paper**](https://drive.google.com/file/d/15qNgiOZ4kf3RwoXqTrWATdsml5Y4N-DM/view?usp=sharing)
 
 ---
 
